@@ -182,6 +182,9 @@ protected:
   void evaluateDefines(string& statement);
 
   string filepath();
+  #if !defined(_WIN32)
+  string resolveCI(const string& path);
+  #endif
   string text(string s);
   int64_t character(string s);
   void validateName(const string& name);

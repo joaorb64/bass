@@ -151,6 +151,9 @@ bool Bass::assemble(const string& statement) {
     if(!p(0).match("\"*\"")) name = p.take(0);
     if(!p(0).match("\"*\"")) error("missing filename");
     string filename = {filepath(), p.take(0).trim<1>("\"")};
+    #if !defined(_WIN32)
+    filename = resolveCI(filename);
+    #endif
     file fp;
     if(!fp.open(filename, file::mode::read)) error("file not found: ", filename);
     unsigned offset = p.size() ? evaluate(p.take(0)) : 0;
@@ -222,6 +225,9 @@ bool Bass::assemble(const string& statement) {
       targetFile.seek(currOffset);
     } else {
       string filename = {filepath(), p.take(0).trim<1>("\"")};
+      #if !defined(_WIN32)
+      filename = resolveCI(filename);
+      #endif
 
       // attempt to open file
       file fp;
@@ -281,6 +287,9 @@ bool Bass::assemble(const string& statement) {
       targetFile.seek(currOffset);
     } else {
       string filename = {filepath(), p.take(0).trim<1>("\"")};
+      #if !defined(_WIN32)
+      filename = resolveCI(filename);
+      #endif
 
       // attempt to open file
       file fp;
@@ -345,6 +354,9 @@ bool Bass::assemble(const string& statement) {
       targetFile.seek(currOffset);
     } else {
       string filename = {filepath(), p.take(0).trim<1>("\"")};
+      #if !defined(_WIN32)
+      filename = resolveCI(filename);
+      #endif
 
       // attempt to open file
       file fp;

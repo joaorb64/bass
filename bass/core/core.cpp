@@ -21,15 +21,20 @@ bool Bass::target(const string& filename, bool create) {
 }
 
 bool Bass::source(const string& filename) {
-  if(!file::exists(filename)) {
+  #if !defined(_WIN32)
+  string fn = resolveCI(filename);
+  #else
+  string fn = filename;
+  #endif
+  if(!file::exists(fn)) {
     print("warning: source file not found: ", filename, "\n");
     return false;
   }
 
   unsigned fileNumber = sourceFilenames.size();
-  sourceFilenames.append(filename);
+  sourceFilenames.append(fn);
 
-  string data = file::read(filename);
+  string data = file::read(fn);
   data.transform("\t\r", "  ");
 
   lstring lines = data.split("\n");
@@ -45,7 +50,7 @@ bool Bass::source(const string& filename) {
 
       if(statement.match("include \"?*\"")) {
         statement.trim<1>("include \"", "\"");
-        source({dir(filename), statement});
+        source({dir(fn), statement});
       } else {
         Instruction instruction;
         instruction.statement = statement;

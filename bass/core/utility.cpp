@@ -196,6 +196,49 @@ unknown:
   return 0;
 }
 
+#if !defined(_WIN32)
+string Bass::resolveCI(const string& path) {
+  if(file::exists(path)) return path;
+
+  lstring parts = string(path).split("/");
+  string result;
+
+  if(path.beginsWith("/")) {
+    result = "/";
+    if(parts.size() && parts[0].empty()) parts.take(0);
+  }
+
+  for(unsigned i = 0; i < parts.size(); i++) {
+    string part = parts[i];
+    bool last = (i + 1 == parts.size());
+
+    if(part.empty() || part == "." || part == "..") {
+      result.append(part);
+      if(!last) result.append("/");
+      continue;
+    }
+
+    string dirPath = result.empty() ? string(".") : string(result).rtrim<1>("/");
+    DIR* d = opendir(dirPath);
+    if(d) {
+      struct dirent* entry;
+      while((entry = readdir(d)) != nullptr) {
+        if(string(entry->d_name).iequals(part)) {
+          part = entry->d_name;
+          break;
+        }
+      }
+      closedir(d);
+    }
+
+    result.append(part);
+    if(!last) result.append("/");
+  }
+
+  return result.empty() ? path : result;
+}
+#endif
+
 void Bass::validateName(const string& name) {
   if(!queryPhase()) return;
 
